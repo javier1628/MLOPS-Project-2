@@ -9,8 +9,8 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/YOUR_USERNAME/mlops-glue-training.git
-cd mlops-glue-training
+git clone https://github.com/YOUR_USERNAME/MLOPS-Project-2.git
+cd MLOPS-Project-2
 
 # Build Docker image
 docker build -t glue-training:latest .
@@ -55,8 +55,8 @@ Training completes in approximately 45-60 minutes on CPU. Results are saved to `
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/mlops-glue-training.git
-cd mlops-glue-training
+git clone https://github.com/YOUR_USERNAME/MLOPS-Project-2.git
+cd MLOPS-Project-2
 
 # Build Docker image
 docker build -t glue-training:latest .
