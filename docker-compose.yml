@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  training:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: glue-training:latest
+    container_name: glue-trainer
+    
+    # Mount volumes to persist checkpoints and logs
+    volumes:
+      - ./checkpoints:/app/checkpoints
+      - ./wandb:/root/.local/share/wandb  # W&B cache
+    
+    # Environment variables
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY:-}  # Set via env or .env file
+      - WANDB_PROJECT=docker-glue-training
+      - WANDB_DIR=/app/wandb
+    
+    # Override command to customize hyperparameters
+    # Uncomment and modify as needed
+    # command: >
+    #   python train.py
+    #   --checkpoint_dir /app/checkpoints
+    #   --lr 3e-5
+    #   --weight_decay 0.01
+    #   --warmup_steps 100
+    #   --max_epochs 3
+    #   --no_wandb
+    
+    # Resource limits (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 8G
+
+  # Alternative: Run with W&B disabled
+  training-no-wandb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: glue-training:latest
+    container_name: glue-trainer-no-wandb
+    profiles: ["no-wandb"]  # Only runs when profile is specified
+    
+    volumes:
+      - ./checkpoints:/app/checkpoints
+    
+    command: >
+      python train.py
+      --checkpoint_dir /app/checkpoints
+      --lr 3e-5
+      --weight_decay 0.01
+      --warmup_steps 100
+      --train_batch_size 16
+      --max_epochs 3
+      --no_wandb
+      --task_name mrpc
+
+  # Quick test service (1 epoch, no W&B)
+  training-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: glue-training:latest
+    container_name: glue-trainer-test
+    profiles: ["test"]
+    
+    volumes:
+      - ./checkpoints:/app/checkpoints
+    
+    command: >
+      python train.py
+      --checkpoint_dir /app/checkpoints
+      --lr 2e-5
+      --max_epochs 1
+      --train_batch_size 8
+      --no_wandb
+      --task_name mrpc
