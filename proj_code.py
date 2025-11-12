@@ -9,7 +9,6 @@ from typing import Optional
 
 
 def check_and_fix_numpy():
-    """Check NumPy version and provide helpful guidance"""
     try:
         import numpy as np
         numpy_version = tuple(map(int, np.__version__.split('.')[:2]))
@@ -44,7 +43,6 @@ from transformers import (
 
 
 def check_wandb_auth():
-    """Check if W&B is authenticated"""
     try:
         api = wandb.Api()
         api.viewer()
@@ -52,12 +50,6 @@ def check_wandb_auth():
     except Exception:
         return False
 
-
-def print_startup_info():
-    """Print helpful startup information"""
-    print("=" * 70)
-    print("🤖 GLUE Training Script")
-    print("=" * 70)
     
     # Check NumPy
     import numpy as np
@@ -207,9 +199,7 @@ class GLUEDataModule(L.LightningDataModule):
 # MODEL
 # ============================================================================
 
-class GLUETransformer(L.LightningModule):
-    """Lightning Module for GLUE tasks"""
-    
+class GLUETransformer(L.LightningModule):    
     def __init__(
         self,
         model_name_or_path: str,
@@ -236,18 +226,15 @@ class GLUETransformer(L.LightningModule):
         self.validation_step_outputs = []
 
     def forward(self, **inputs):
-        """Forward pass through the model"""
         return self.model(**inputs)
 
     def training_step(self, batch, batch_idx):
-        """Training step"""
         outputs = self(**batch)
         loss = outputs[0]
         self.log("train_loss", loss, prog_bar=True)
         return loss
 
     def validation_step(self, batch, batch_idx, dataloader_idx=0):
-        """Validation step"""
         outputs = self(**batch)
         val_loss, logits = outputs[:2]
 
@@ -261,7 +248,6 @@ class GLUETransformer(L.LightningModule):
         return val_loss
 
     def on_validation_epoch_end(self):
-        """Aggregate validation results at the end of epoch"""
         if self.hparams.task_name == "mnli":
             for i, output in enumerate(self.validation_step_outputs):
                 split = self.hparams.eval_splits[i].split("_")[-1]
@@ -286,7 +272,6 @@ class GLUETransformer(L.LightningModule):
         self.validation_step_outputs.clear()
 
     def configure_optimizers(self):
-        """Configure optimizers and learning rate schedulers"""
         model = self.model
         no_decay = ["bias", "LayerNorm.weight"]
         optimizer_grouped_parameters = [
@@ -324,7 +309,6 @@ class GLUETransformer(L.LightningModule):
 # ============================================================================
 
 def parse_args():
-    """Parse command line arguments"""
     parser = argparse.ArgumentParser(
         description="Train a transformer model on GLUE tasks with W&B tracking"
     )
@@ -462,7 +446,6 @@ def parse_args():
 # ============================================================================
 
 def main():
-    """Main training function"""
     # Print startup information
     print_startup_info()
     
