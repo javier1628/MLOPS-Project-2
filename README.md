@@ -1,6 +1,5 @@
-# GLUE Text Classification Training with Docker
+#  Training with Docker
 
-Production-ready training pipeline for GLUE benchmark tasks using PyTorch Lightning, Transformers, and Docker. Train transformer models on text classification tasks with a single command, fully reproducible across platforms.
 
 [![Docker](https://img.shields.io/badge/docker-ready-blue)](https://www.docker.com/)
 [![Python](https://img.shields.io/badge/python-3.11-green)](https://www.python.org/)
@@ -31,9 +30,6 @@ Training completes in approximately 45-60 minutes on CPU. Results are saved to `
 - [Installation](#installation)
 - [Usage](#usage)
 - [Configuration](#configuration)
-- [Results](#results)
-- [Cloud Deployment](#cloud-deployment)
-- [Troubleshooting](#troubleshooting)
 - [Project Structure](#project-structure)
 
 ---
@@ -42,9 +38,7 @@ Training completes in approximately 45-60 minutes on CPU. Results are saved to `
 
 - **Dockerized Training**: Fully containerized for reproducibility
 - **Single Command Execution**: Start training with one line
-- **Highly Configurable**: 20+ hyperparameters via command-line interface
 - **Experiment Tracking**: Weights & Biases integration (optional)
-- **Reproducible**: Consistent results across different platforms
 - **Robust Error Handling**: Automatic detection and handling of common issues
 - **Production-Ready**: Includes checkpointing, logging, and monitoring
 
@@ -54,10 +48,6 @@ Training completes in approximately 45-60 minutes on CPU. Results are saved to `
 
 - **Docker**: Version 20.10 or later ([installation guide](https://docs.docker.com/get-docker/))
 - **Git**: For repository management
-- **Hardware**: Minimum 4GB RAM recommended
-- **Storage**: Approximately 10GB free disk space
-
-Note: Python installation is not required when using Docker.
 
 ---
 
@@ -68,7 +58,7 @@ Note: Python installation is not required when using Docker.
 git clone https://github.com/YOUR_USERNAME/mlops-glue-training.git
 cd mlops-glue-training
 
-# Build Docker image (first build takes 5-10 minutes)
+# Build Docker image
 docker build -t glue-training:latest .
 
 # Verify successful build
@@ -166,9 +156,7 @@ docker-compose --profile test up training-test
 | `--task_name` | mrpc | GLUE benchmark task |
 | `--no_wandb` | False | Disable Weights & Biases tracking |
 
-### Available GLUE Tasks
 
-`mrpc`, `sst2`, `cola`, `qnli`, `qqp`, `rte`, `mnli`, `wnli`, `stsb`
 
 ### View All Options
 
@@ -178,22 +166,6 @@ python train.py --help
 
 ---
 
-## Results
-
-### Expected Performance on MRPC Task
-
-With default hyperparameters:
-- **Validation Accuracy**: 85-87%
-- **F1 Score**: 89-91%
-- **Training Time**: 45-60 minutes on CPU (3 epochs)
-
-### Reproducibility
-
-Results are deterministic when using the same hyperparameters and random seed across different platforms.
-
----
-
-## Cloud Deployment
 
 ### GitHub Codespaces
 
@@ -213,8 +185,6 @@ docker run -it \
     --no_wandb
 ```
 
-Note: Batch size reduction to 16 may be necessary due to 4GB RAM limit in standard Codespaces.
-
 ### Docker Playground
 
 ```bash
@@ -233,61 +203,6 @@ docker run -it glue-training:latest \
 
 ---
 
-## Troubleshooting
-
-### Out of Memory Errors
-
-Reduce batch size to accommodate available RAM:
-
-```bash
-docker run -it glue-training:latest \
-  python train.py --train_batch_size 8
-```
-
-For severely constrained environments, use batch size 4 with gradient accumulation:
-
-```bash
-docker run -it glue-training:latest \
-  python train.py --train_batch_size 4 --accumulate_grad_batches 4
-```
-
-### Long Training Duration
-
-CPU training is significantly slower than GPU (approximately 10x). Expected times:
-- 1 epoch: 15-20 minutes
-- 3 epochs: 45-60 minutes
-
-For quick validation:
-
-```bash
-docker run -it glue-training:latest \
-  python train.py --max_epochs 1 --no_wandb
-```
-
-### Weights & Biases Authentication
-
-The training script includes automatic fallback for W&B authentication failures. To explicitly disable:
-
-```bash
-python train.py --no_wandb
-```
-
-### Docker Build Failures
-
-Ensure Docker daemon is running:
-
-```bash
-docker ps
-```
-
-Clear Docker cache if build issues persist:
-
-```bash
-docker system prune -a
-```
-
----
-
 ## Examples
 
 ### Hyperparameter Sweep - Learning Rates
@@ -300,7 +215,7 @@ for lr in 1e-5 2e-5 3e-5 5e-5; do
 done
 ```
 
-### Training on Different GLUE Tasks
+### Training on Different Tasks
 
 ```bash
 # Sentiment analysis (SST-2)
@@ -328,22 +243,3 @@ mlops-glue-training/
 └── checkpoints/        # Model checkpoints (created during training)
 ```
 
----
-
-## Contributing
-
-Contributions are welcome. Please open an issue to discuss proposed changes before submitting a pull request.
-
----
-
-## License
-
-This project is licensed under the MIT License. See LICENSE file for details.
-
----
-
-## Acknowledgments
-
-- [Hugging Face Transformers](https://huggingface.co/transformers/) - Pre-trained models and utilities
-- [PyTorch Lightning](https://lightning.ai/) - Training framework
-- [GLUE Benchmark](https://gluebenchmark.com/) - Evaluation tasks and datasets
